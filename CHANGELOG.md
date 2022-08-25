@@ -6,6 +6,13 @@ This project adheres to [Semantic Versioning](https://semver.org), except that â
 
 Do not manually edit this file. It will be automatically updated when a new release is published.
 
+## 0.13.0
+_25 August 2022_
+
+* Disable cargo publish
+* Make sure there is  a single manifest store in the asset ([#114](https://github.com/contentauth/c2pa-rs/pull/114))
+* (MINOR) Switch to "lib" for crate-type ([#113](https://github.com/contentauth/c2pa-rs/pull/113))
+
 ## 0.12.0
 _16 August 2022_
 
