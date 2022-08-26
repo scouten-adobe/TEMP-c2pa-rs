@@ -266,15 +266,8 @@ jobs:
         run: |
           git log --format="%s" ${{ steps.get-latest-tag.outputs.tag }}..HEAD | { grep "(MINOR)" || :; }
 
-      - name: DEBUG output of previous commit step
-        if: ${{ steps.bump_exists.outputs.stdout == '' }}
-        uses: actions/github-script@v3
-        with:
-          script: |
-            core.setFailed("DEBUG: failure expected here")
-
       - name: If this step fails, change title of the PR to include (MINOR) tag
         uses: obi1kenobi/cargo-semver-checks-action@v1
-        if: "${{ github.bump_exists.outputs.stdout != '' }}"
+        if: ${{ steps.bump_exists.outputs.stdout != '' }}
         with:
           crate-name: c2pa
