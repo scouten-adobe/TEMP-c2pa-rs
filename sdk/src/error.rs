@@ -249,6 +249,9 @@ pub enum Error {
 
     #[error("prerelease content detected")]
     PrereleaseError,
+
+    #[error("Unnecessary error")]
+    UnnecessaryError,
 }
 
 /// A specialized `Result` type for C2PA toolkit operations.
