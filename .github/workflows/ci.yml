@@ -275,6 +275,7 @@ jobs:
           sed -i "s/^version = \"[^\"]*\"$/version = \"$VERSION\"/;" sdk/Cargo.toml
           git config user.email "nobody@example.com"
           git config --global user.name "PR validation bot"
+          git add .
           git commit -m "DO NOT PUSH BACK TO PR: Bump crate version"
         env:
           VERSION: ${{ steps.set-version.outputs.version }}
