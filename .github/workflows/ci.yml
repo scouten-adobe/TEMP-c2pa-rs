@@ -268,7 +268,7 @@ jobs:
 
       - name: (DEBUG) what's the PR title?
         run: |
-          echo PR title = ${{ github.event.pull_request.title }}
+          echo "PR title = ${{ github.event.pull_request.title }}"
       
       - name: (DEBUG) does it say (MINOR)?
         if: ${{ steps.bump_exists.outputs.stdout == ''}} || contains(github.event.pull_request.title, "(MINOR)")
