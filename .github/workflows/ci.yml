@@ -261,19 +261,26 @@ jobs:
         with:
           semver_only: true
 
+      - name: Set new version
+        uses: paulhatch/semantic-version@v4.0.2
+        id: set-version
+        with:
+          tag_prefix: "v"
+          format: "${major}.${minor}.${patch}"
+          major_pattern: "(MAJOR)"
+          minor_pattern: "(MINOR)"
+
+      - name: TEMPORARILY bump crate version
+        run: |
+          sed -i "s/^version = \"[^\"]*\"$/version = \"$VERSION\"/;" sdk/Cargo.toml
+          git commit -m "DO NOT PUSH BACK TO PR: Bump crate version"
+        env:
+          VERSION: ${{ steps.set-version.outputs.version }}
+
       - name: Has (MINOR) tag been used in a previous commit?
         id: bump_exists
         run: |
           git log --format="%s" ${{ steps.get-latest-tag.outputs.tag }}..HEAD | { grep "(MINOR)" || :; }
-
-      - name: (DEBUG) what's the PR title?
-        run: |
-          echo "PR title = ${{ github.event.pull_request.title }}"
-      
-      - name: (DEBUG) does it say (MINOR)?
-        if: ${{ steps.bump_exists.outputs.stdout == ''}} || contains(github.event.pull_request.title, "(MINOR)")
-        run: |
-          echo "YAY, got it right!"
 
       - name: If this step fails, change title of the PR to include (MINOR) tag
         uses: obi1kenobi/cargo-semver-checks-action@v1
