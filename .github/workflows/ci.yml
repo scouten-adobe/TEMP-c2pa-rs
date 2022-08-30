@@ -261,6 +261,11 @@ jobs:
         with:
           semver_only: true
 
+      = name: (DEBUG) Check latest tag
+        id: debug
+        run: |
+          echo previous version = ${{ steps.get-latest-tag.outputs.tag }}
+
       - name: Has (MINOR) tag been used in a previous commit?
         id: bump_exists
         run: |
