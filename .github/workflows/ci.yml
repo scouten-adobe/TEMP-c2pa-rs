@@ -267,8 +267,8 @@ jobs:
         with:
           tag_prefix: "v"
           format: "${major}.${minor}.${patch}"
-          major_pattern: "(MAJOR)"
-          minor_pattern: "(MINOR)"
+          major_pattern: "(MAJORXXXX)"
+          minor_pattern: "(MINORXXXX)"
 
       - name: TEMPORARILY bump crate version
         run: |
