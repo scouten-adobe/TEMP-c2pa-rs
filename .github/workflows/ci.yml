@@ -248,15 +248,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        if: ${{ !contains(github.event.pull_request.title, '(MINOR)') }}
       
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
+        if: ${{ !contains(github.event.pull_request.title, '(MINOR)') }}
         with:
           toolchain: nightly
           override: true
 
       - name: Get latest existing tag
         uses: actions-ecosystem/action-get-latest-tag@v1
+        if: ${{ !contains(github.event.pull_request.title, '(MINOR)') }}
         id: get-latest-tag
         with:
           semver_only: true
@@ -264,6 +267,7 @@ jobs:
       - name: Set new version
         uses: paulhatch/semantic-version@v4.0.2
         id: set-version
+        if: ${{ !contains(github.event.pull_request.title, '(MINOR)') }}
         with:
           tag_prefix: "v"
           format: "${major}.${minor}.${patch}"
@@ -271,6 +275,7 @@ jobs:
           minor_pattern: "(MINORXXXX)"
 
       - name: TEMPORARILY bump crate version
+        if: ${{ !contains(github.event.pull_request.title, '(MINOR)') }}
         run: |
           sed -i "s/^version = \"[^\"]*\"$/version = \"$VERSION\"/;" sdk/Cargo.toml
           git config user.email "nobody@example.com"
@@ -282,6 +287,7 @@ jobs:
 
       - name: Has (MINOR) tag been used in a previous commit?
         id: bump_exists
+        if: ${{ !contains(github.event.pull_request.title, '(MINOR)') }}
         run: |
           git log --format="%s" ${{ steps.get-latest-tag.outputs.tag }}..HEAD | { grep "(MINOR)" || :; }
 
@@ -292,6 +298,6 @@ jobs:
 
       - name: If this step fails, change title of the PR to include (MINOR) tag
         uses: obi1kenobi/cargo-semver-checks-action@v1
-        if: ${{ steps.bump_exists.outputs.stdout == ''}} && !contains(github.event.pull_request.title, "(MINOR)")
+        if: ${{ steps.bump_exists.outputs.stdout == '' && !contains(github.event.pull_request.title, '(MINOR)') }}
         with:
           crate-name: c2pa
