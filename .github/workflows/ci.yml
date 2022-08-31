@@ -274,7 +274,7 @@ jobs:
           major_pattern: "(MAJORXXXX)"
           minor_pattern: "(MINORXXXX)"
 
-      - name: TEMPORARILY bump crate version
+      - name: "Bump crate version (NOTE: Not pushed back to repo!)"
         if: ${{ !contains(github.event.pull_request.title, '(MINOR)') }}
         run: |
           sed -i "s/^version = \"[^\"]*\"$/version = \"$VERSION\"/;" sdk/Cargo.toml
@@ -290,11 +290,6 @@ jobs:
         if: ${{ !contains(github.event.pull_request.title, '(MINOR)') }}
         run: |
           git log --format="%s" ${{ steps.get-latest-tag.outputs.tag }}..HEAD | { grep "(MINOR)" || :; }
-
-      - name: (DEBUG) Show PR title
-        if: ${{ !contains(github.event.pull_request.title, '(MINOR)') }}
-        run: |
-          echo "PR title = ${{ github.event.pull_request.title }}"
 
       - name: If this step fails, change title of the PR to include (MINOR) tag
         uses: obi1kenobi/cargo-semver-checks-action@v1
