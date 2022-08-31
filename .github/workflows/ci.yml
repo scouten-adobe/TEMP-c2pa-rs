@@ -285,6 +285,10 @@ jobs:
         run: |
           git log --format="%s" ${{ steps.get-latest-tag.outputs.tag }}..HEAD | { grep "(MINOR)" || :; }
 
+      - name: (DEBUG) Show PR title
+        run: |
+          echo "PR title = ${{ github.event.pull_request.title }}"
+
       - name: If this step fails, change title of the PR to include (MINOR) tag
         uses: obi1kenobi/cargo-semver-checks-action@v1
         if: ${{ steps.bump_exists.outputs.stdout == ''}} && !contains(github.event.pull_request.title, "(MINOR)")
