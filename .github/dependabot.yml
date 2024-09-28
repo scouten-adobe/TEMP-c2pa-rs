@@ -1,0 +1,12 @@
+version: 2
+
+updates:
+  # WARNING: Do not merge back to main.
+  # It's missing the cargo ecosystem listing.
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore"
