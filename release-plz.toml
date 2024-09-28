@@ -41,7 +41,9 @@ name = "c2pa"
 [[package]]
 name = "export_schema"
 publish = false
+release = false
 
 [[package]]
 name = "make_test_images"
 publish = false
+release = false
