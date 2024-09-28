@@ -36,12 +36,12 @@ release_always = false
 release_commits = "^(feat|fix)[(:]"
 
 [[package]]
+name = "c2pa"
+
+[[package]]
 name = "export_schema"
 publish = false
 
 [[package]]
 name = "make_test_images"
 publish = false
-
-[[package]]
-name = "sdk"
