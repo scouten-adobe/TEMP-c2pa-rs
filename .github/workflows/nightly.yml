@@ -73,12 +73,12 @@ jobs:
 
         NEW_BASE_COMMIT=$(git log $BASE_BRANCH -n 1 --format=%H)
 
-        echo Choosing base branch $BASE_BRANCH because it's newer
-        echo $BASE_BRANCH commit ID is $NEW_BASE_COMMIT
+        echo "Choosing base branch $BASE_BRANCH because it's newer"
+        echo "$BASE_BRANCH commit ID is $NEW_BASE_COMMIT"
 
         OLD_BASE_COMMIT=$(git checkout -b nightly --track origin/nightly && git log nightly --skip=1 -n 1 --format=%H)
 
-        echo Nightly commit ID is $OLD_BASE_COMMIT
+        echo "Nightly commit ID is $OLD_BASE_COMMIT"
         
   #   - name: Set new proposed version
   #     uses: paulhatch/semantic-version@v5.4.0
