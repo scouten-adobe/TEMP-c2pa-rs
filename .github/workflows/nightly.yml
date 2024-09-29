@@ -91,7 +91,12 @@ jobs:
           echo "Updating nightly base";
           echo "base-commit=$NEW_BASE_COMMIT" >> "$GITHUB_OUTPUT"
         fi
-    
+
+    - name: Install Rust toolchain
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        components: cargo
+
     - name: Add -nightly+(date)-(commit ID) prefix to crate versions
       id: set-nightly-version
       if: ${{ steps.choose-base.outputs.base-commit != 'skip' }}
@@ -102,27 +107,15 @@ jobs:
         export NIGHTLY_SUFFIX=$(echo -nightly+`date +%F`-`git rev-parse --short HEAD`)
         echo Will add nightly suffix $NIGHTLY_SUFFIX
 
-        echo sed -i "s/^version = \"\\(.*\\)\"/version = \"\\1$NIGHTLY_SUFFIX\"/" sdk/Cargo.toml
         sed -i "s/^version = \"\\(.*\\)\"/version = \"\\1$NIGHTLY_SUFFIX\"/" sdk/Cargo.toml
+
+        cargo update -w
+        git add -f Cargo.lock
 
         echo
         echo Proposed changes:
-
         git diff
     
-  #   - name: Install Rust toolchain
-  #     uses: dtolnay/rust-toolchain@stable
-  #     with:
-  #       components: cargo
-
-  #   - name: Create or update Cargo.lock
-  #     run: |
-  #       cargo update -w
-  #       git add -f Cargo.lock
-
-  #   - name: Report differences for "prepare (release)" commit
-  #     run: git diff
-
   #   - name: Commit Cargo.toml and Cargo.lock
   #     uses: stefanzweifel/git-auto-commit-action@v5
   #     id: commit
