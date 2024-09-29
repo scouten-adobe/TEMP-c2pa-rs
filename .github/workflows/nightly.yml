@@ -98,7 +98,7 @@ jobs:
         echo Force updating nightly branch to point to base branch
         git branch -f nightly
 
-        export NIGHTLY_SUFFIX=$(-nightly+`date +%F`-`git rev-parse --short HEAD`)
+        export NIGHTLY_SUFFIX=$(echo -nightly+`date +%F`-`git rev-parse --short HEAD`)
         echo Will add nightly suffix $NIGHTLY_SUFFIX
 
     # - name: Adjust crate versions to include nightly flag
