@@ -2,12 +2,19 @@ name: Nightly build
 
 on:  
   workflow_dispatch:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
   schedule:
     - cron: "0 5 * * *" # 0500 UTC every day
 
 jobs:
   # Create snapshot of main branch for nightly build
   nightly-snapshot:
+    if: ${{ github.event.label && github.event.label.name == 'release' }}
     name: Create snapshot
     runs-on: ubuntu-latest
 
@@ -18,57 +25,61 @@ jobs:
         fetch-depth: 0
         token: ${{ secrets.GH_ADMIN_COMMIT_TOKEN }}
 
-    - name: Set new proposed version
-      uses: paulhatch/semantic-version@v5.4.0
-      id: set-version
-      with:
-        tag_prefix: "v"
-        version_format: "${major}.${minor}.${patch}"
-        major_pattern: "(MAJOR)"
-        minor_pattern: "(MINOR)"
+    - name: (DEBUG) Check branch list
+      run: |
+        git --no-pager branch --format="%(refname:short)" | grep -E '^(release-plz|main)' | sort -r
+
+  #   - name: Set new proposed version
+  #     uses: paulhatch/semantic-version@v5.4.0
+  #     id: set-version
+  #     with:
+  #       tag_prefix: "v"
+  #       version_format: "${major}.${minor}.${patch}"
+  #       major_pattern: "(MAJOR)"
+  #       minor_pattern: "(MINOR)"
     
-    - name: Add -nightly+(date)-(commit ID) prefix to version
-      id: set-nightly-version
-      run: |
-        echo version=${{ steps.set-version.outputs.version }}-nightly+`date +%F`-`git rev-parse --short HEAD` >> "$GITHUB_OUTPUT"
+  #   - name: Add -nightly+(date)-(commit ID) prefix to version
+  #     id: set-nightly-version
+  #     run: |
+  #       echo version=${{ steps.set-version.outputs.version }}-nightly+`date +%F`-`git rev-parse --short HEAD` >> "$GITHUB_OUTPUT"
 
-    - name: Log new version & changelog
-      run: |
-        echo "Proposed new version: $VERSION"
-        echo "Nightly version: $NIGHTLY_VERSION"
-      env:
-        VERSION: ${{ steps.set-version.outputs.version }}
-        NIGHTLY_VERSION: ${{ steps.set-nightly-version.outputs.version }}
+  #   - name: Log new version & changelog
+  #     run: |
+  #       echo "Proposed new version: $VERSION"
+  #       echo "Nightly version: $NIGHTLY_VERSION"
+  #     env:
+  #       VERSION: ${{ steps.set-version.outputs.version }}
+  #       NIGHTLY_VERSION: ${{ steps.set-nightly-version.outputs.version }}
 
-    - name: Bump crate versions
-      run: |
-        sed -i "s/^version = \"[^\"]*\"$/version = \"$VERSION\"/;" sdk/Cargo.toml
-      env:
-        VERSION: ${{ steps.set-nightly-version.outputs.version }}
+  #   - name: Bump crate versions
+  #     run: |
+  #       sed -i "s/^version = \"[^\"]*\"$/version = \"$VERSION\"/;" sdk/Cargo.toml
+  #     env:
+  #       VERSION: ${{ steps.set-nightly-version.outputs.version }}
     
-    - name: Install Rust toolchain
-      uses: dtolnay/rust-toolchain@stable
-      with:
-        components: cargo
+  #   - name: Install Rust toolchain
+  #     uses: dtolnay/rust-toolchain@stable
+  #     with:
+  #       components: cargo
 
-    - name: Create or update Cargo.lock
-      run: |
-        cargo update -w
-        git add -f Cargo.lock
+  #   - name: Create or update Cargo.lock
+  #     run: |
+  #       cargo update -w
+  #       git add -f Cargo.lock
 
-    - name: Report differences for "prepare (release)" commit
-      run: git diff
+  #   - name: Report differences for "prepare (release)" commit
+  #     run: git diff
 
-    - name: Commit Cargo.toml and Cargo.lock
-      uses: stefanzweifel/git-auto-commit-action@v5
-      id: commit
-      with:
-        branch: nightly
-        push_options: '--force'
-        commit_message: Prepare ${{ steps.set-nightly-version.outputs.version }} release
-        commit_user_name: Adobe CAI Team
-        commit_user_email: noreply@adobe.com
-        create_branch: true
+  #   - name: Commit Cargo.toml and Cargo.lock
+  #     uses: stefanzweifel/git-auto-commit-action@v5
+  #     id: commit
+  #     with:
+  #       branch: nightly
+  #       push_options: '--force'
+  #       commit_message: Prepare ${{ steps.set-nightly-version.outputs.version }} release
+  #       commit_user_name: Adobe CAI Team
+  #       commit_user_email: noreply@adobe.com
+  #       create_branch: true
 
   tests:
     name: Unit tests
