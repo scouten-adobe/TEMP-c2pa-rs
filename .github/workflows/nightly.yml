@@ -92,7 +92,7 @@ jobs:
         echo "Choosing base branch $BASE_BRANCH because it's newer"
         echo "$BASE_BRANCH commit ID is $NEW_BASE_COMMIT"
 
-        if [[ "$OLD_BASE_COMMIT" == "$NEW_BASE_COMMIT" && "$GH_EVENT_NAME" == "pull_request"]]; then
+        if [[ "$OLD_BASE_COMMIT" == "$NEW_BASE_COMMIT" && "$GH_EVENT_NAME" == "pull_request" ]]; then
           echo "Nightly already points to same base; leave unchanged";
           echo "base-commit=skip" >> "$GITHUB_OUTPUT"
         else
