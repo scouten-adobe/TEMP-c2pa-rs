@@ -35,10 +35,6 @@ jobs:
 
         echo
 
-        OLD_BASE_COMMIT=$(git checkout -b nightly --track origin/nightly && git log nightly --skip=1 -n 1 --format=%H)
-
-        echo "Nightly commit ID is $OLD_BASE_COMMIT"
-
         LATEST_RELEASE_PLZ=$(git --no-pager branch --format="%(refname:short)" --remote |
           sed 's|origin/||' |
           grep -E '^release-plz-20' |
@@ -84,13 +80,8 @@ jobs:
         echo "Choosing base branch $BASE_BRANCH because it's newer"
         echo "$BASE_BRANCH commit ID is $NEW_BASE_COMMIT"
 
-        if [[ "$OLD_BASE_COMMIT" == "$NEW_BASE_COMMIT" ]]; then
-          echo "Nightly already points to same base; leave unchanged";
-          echo "base-commit=skip" >> "$GITHUB_OUTPUT"
-        else
-          echo "Updating nightly base";
-          echo "base-commit=$NEW_BASE_COMMIT" >> "$GITHUB_OUTPUT"
-        fi
+        echo "Updating nightly base";
+        echo "base-commit=$NEW_BASE_COMMIT" >> "$GITHUB_OUTPUT"
 
     - name: Install Rust toolchain
       uses: dtolnay/rust-toolchain@stable
@@ -99,7 +90,6 @@ jobs:
 
     - name: Add -nightly+(date)-(commit ID) prefix to crate versions
       id: set-nightly-version
-      if: ${{ steps.choose-base.outputs.base-commit != 'skip' }}
       run: |
         echo Force updating nightly branch to point to base branch
         git branch -f nightly
@@ -120,7 +110,6 @@ jobs:
     - name: Commit Cargo.toml and Cargo.lock
       uses: stefanzweifel/git-auto-commit-action@v5
       id: commit
-      if: ${{ steps.choose-base.outputs.base-commit != 'skip' }}
       with:
         branch: nightly
         push_options: '--force'
