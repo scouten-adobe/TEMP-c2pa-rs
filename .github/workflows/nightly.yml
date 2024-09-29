@@ -37,11 +37,23 @@ jobs:
           head -n 1)
 
         if [ -z "$LATEST_RELEASE_PLZ" ]; then
+
+          echo "No release-plz branch; using main"
+          git checkout -b main --track main
           BASE_BRANCH=main;
-          echo "No release-plz branch; using main";
+
         else
-          echo Found RP branch $LATEST_RELEASE_PLZ;
+
+          echo "Found RP branch $LATEST_RELEASE_PLZ; comparing against main"
+
+          git checkout -b "$LATEST_RELEASE_PLZ" --track "origin/$LATEST_RELEASE_PLZ"
+          git checkout -b main --track main
+
+          export RP_TS=$(git log -1 --format=%cd --date=iso-strict $LATEST_RELEASE_PLZ)
+          export MAIN_TS=$(git log -1 --format=%cd --date=iso-strict main)
+
           BASE_BRANCH=$LATEST_RELEASE_PLZ;
+        
         fi
 
         echo Found base branch $BASE_BRANCH
