@@ -99,7 +99,7 @@ jobs:
           exit 0
         elif [[ "$GH_EVENT_NAME" == "push" ]]; then
           LATEST_TAG=$(git describe --tags --abbrev=0)
-          if ![[ git --no-pager log $LATEST_TAG..head --pretty=format:"%s" | grep -v "^chore" ]];
+          if ![[ git --no-pager log $LATEST_TAG..head --pretty=format:"%s" | grep -v "^chore" ]]; then
             echo "Found non-chore commits on main since last commit; leave unchanged"
             echo "(Expecting release-plz to create a new release branch)"
             echo "base-commit=skip" >> "$GITHUB_OUTPUT"
