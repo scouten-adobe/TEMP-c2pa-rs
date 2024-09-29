@@ -8,6 +8,9 @@ on:
       - synchronize
       - reopened
       - edited
+  push:
+    branches:
+      - main
   schedule:
     - cron: "0 * * * *" # hourly (should be 0500 UTC)
       # NOTE: DO NOT MERGE THIS BACK TO MAIN
