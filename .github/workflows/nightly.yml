@@ -113,7 +113,7 @@ jobs:
       with:
         branch: nightly
         push_options: '--force'
-        commit_message: Prepare ${{ steps.set-nightly-version.outputs.version }} release
+        commit_message: Prepare nightly release
         commit_user_name: Adobe CAI Team
         commit_user_email: noreply@adobe.com
         create_branch: true
