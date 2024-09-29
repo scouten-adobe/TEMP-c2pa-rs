@@ -113,14 +113,14 @@ jobs:
           echo --- END DEBUG ---
 
           git --no-pager log --pretty=format:"%s" $LATEST_TAG..HEAD | grep -v "^chore"
-          if [[ $? ]]; then
-            echo "Push to main, but there are only chore commits since last tag."
-            echo "Not expecting a new release branch";
-          else
+          if [ $? -eq 0 ]; then
             echo "Found non-chore commits on main since last commit; leave unchanged"
             echo "(Expecting release-plz to create a new release branch)"
             echo "base-commit=skip" >> "$GITHUB_OUTPUT"
             exit 0
+          else
+            echo "Push to main, but there are only chore commits since last tag."
+            echo "Not expecting a new release branch";
           fi
         fi
 
