@@ -1,4 +1,4 @@
-name: Nightly
+name: Nightly branch
 
 on:  
   workflow_dispatch:
@@ -12,7 +12,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: "0 5 * * *"
+    - cron: "0 5 * * *" # 0500 UTC every day
 
 jobs:
   # Create snapshot of latest main or release branch for nightly build
