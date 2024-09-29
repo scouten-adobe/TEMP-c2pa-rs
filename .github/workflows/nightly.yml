@@ -101,8 +101,8 @@ jobs:
         export NIGHTLY_SUFFIX=$(echo -nightly-`date +%F`-`git rev-parse --short HEAD`)
         echo Will add nightly suffix $NIGHTLY_SUFFIX
 
-        echo sed -i "s!^version = \"([^\"]*)\"$!version = \"&$NIGHTLY_SUFFIX\"!;" sdk/Cargo.toml
-        sed -i "s!^version = \"([^\"]*)\"$!version = \"&$NIGHTLY_SUFFIX\"!;" sdk/Cargo.toml
+        echo sed -i "s!^version = \"([^\"]*)\"\$!version = \"&$NIGHTLY_SUFFIX\"!;" sdk/Cargo.toml
+        sed -i "s!^version = \"([^\"]*)\"\$!version = \"&$NIGHTLY_SUFFIX\"!;" sdk/Cargo.toml
 
         echo
         echo Proposed changes:
