@@ -47,7 +47,12 @@ jobs:
           echo "Found RP branch $LATEST_RELEASE_PLZ; comparing against main"
 
           git checkout -b "$LATEST_RELEASE_PLZ" --track "origin/$LATEST_RELEASE_PLZ"
-          git checkout -b main --track main
+
+          if git show-ref --verify --quiet refs/heads/main; then
+            echo "Branch 'main' already exists locally";
+          else
+            git checkout -b main --track origin/main;
+          fi
 
           export RP_TS=$(git log -1 --format=%cd --date=iso-strict $LATEST_RELEASE_PLZ)
           export MAIN_TS=$(git log -1 --format=%cd --date=iso-strict main)
