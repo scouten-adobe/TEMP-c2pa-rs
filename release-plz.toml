@@ -38,6 +38,10 @@ release_commits = "^(feat|fix)[(:]"
 
 [[package]]
 name = "c2pa"
+changelog_path = "./CHANGELOG.md"
+# This being the most important crate in the workspace,
+# we will leave the changelog in the repo root instead
+# of in the `sdk` folder (which would be the default).
 
 [[package]]
 name = "export_schema"
