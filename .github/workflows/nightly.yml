@@ -28,12 +28,14 @@ jobs:
       run: |
         git --no-pager branch --remote | sed 's|origin/||'
 
-    - name: (DEBUG) Sort branch list
+    - name: (DEBUG) Choose base branch
       run: |
-        git --no-pager branch --format="%(refname:short)" --remote |\
+        LATEST_RELEASE_PLZ = git --no-pager branch --format="%(refname:short)" --remote |\
           sed 's|origin/||' |\
-          grep -E '^(release-plz|main)' |\
-          sort -r
+          grep -E '^release-plz-20' |\
+          sort -r |\
+          head -n 1
+        echo Found RP branch $LASTEST_RELEASE_PLZ
     
   #   - name: Set new proposed version
   #     uses: paulhatch/semantic-version@v5.4.0
