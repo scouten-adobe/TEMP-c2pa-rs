@@ -35,8 +35,17 @@ jobs:
           grep -E '^release-plz-20' |\
           sort -r |\
           head -n 1)
-        echo Found RP branch $LATEST_RELEASE_PLZ
-    
+
+        if [ -z "$LATEST_RELEASE_PLZ" ]; then \
+          BASE_BRANCH=main \
+          echo "No release-plz branch; using main"; \
+        else \
+          echo Found RP branch $LATEST_RELEASE_PLZ; \
+          BASE_BRANCH=$LATEST_RELEASE_PLZ \
+        fi
+
+        echo Found base branch $BASE_BRANCH
+        
   #   - name: Set new proposed version
   #     uses: paulhatch/semantic-version@v5.4.0
   #     id: set-version
