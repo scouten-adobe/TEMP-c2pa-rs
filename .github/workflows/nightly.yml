@@ -57,6 +57,9 @@ jobs:
           export RP_TS=$(git log -1 --format=%cd --date=iso-strict $LATEST_RELEASE_PLZ)
           export MAIN_TS=$(git log -1 --format=%cd --date=iso-strict main)
 
+          echo "Branch $LATEST_RELEASE_PLZ updated at $RP_TS"
+          echo "Branch main updated at $MAIN_TS"
+
           if [[ "$RP_TS" > "$MAIN_TS" ]]; then
             echo "Branch $LATEST_RELEASE_PLZ is newer than main"
             BASE_BRANCH=$LATEST_RELEASE_PLZ;
