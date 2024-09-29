@@ -99,7 +99,7 @@ jobs:
           exit 0
         elif [[ "$GH_EVENT_NAME" == "push" ]]; then
           LATEST_TAG=$(git describe --tags --abbrev=0)
-          if git --no-pager log --pretty=format:"%s" $LATEST_TAG..head | grep -v "^chore" ; then
+          if git --no-pager log --pretty=format:"%s" $LATEST_TAG..HEAD | grep -v "^chore" ; then
             echo "Push to main, but there are only chore commits since last tag."
             echo "Not expecting a new release branch";
           else
