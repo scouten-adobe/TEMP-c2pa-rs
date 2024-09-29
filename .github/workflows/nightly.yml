@@ -103,7 +103,8 @@ jobs:
             echo "Found non-chore commits on main since last commit; leave unchanged"
             echo "(Expecting release-plz to create a new release branch)"
             echo "base-commit=skip" >> "$GITHUB_OUTPUT"
-          exit 0
+            exit 0
+          fi
         fi
 
         echo "Updating nightly base";
