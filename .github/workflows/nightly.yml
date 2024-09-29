@@ -109,10 +109,11 @@ jobs:
           echo
           echo --- git log + grep ---
           git --no-pager log --pretty=format:"%s" $LATEST_TAG..HEAD | grep -v "^chore"
-          echo
+          echo EXIT STATUS $?
           echo --- END DEBUG ---
 
-          if git --no-pager log --pretty=format:"%s" $LATEST_TAG..HEAD | grep -v "^chore" ; then
+          git --no-pager log --pretty=format:"%s" $LATEST_TAG..HEAD | grep -v "^chore"
+          if [[ $? ]]; then
             echo "Push to main, but there are only chore commits since last tag."
             echo "Not expecting a new release branch";
           else
