@@ -14,7 +14,7 @@ on:
 jobs:
   # Create snapshot of main branch for nightly build
   nightly-snapshot:
-    if: ${{ github.event.label && github.event.label.name == 'release' }}
+    # if: ${{ !github.event.label || github.event.label.name == 'release' }}
     name: Create snapshot
     runs-on: ubuntu-latest
 
@@ -28,6 +28,11 @@ jobs:
     - name: (DEBUG) Check branch list
       run: |
         git --no-pager branch --format="%(refname:short)" | grep -E '^(release-plz|main)' | sort -r
+    
+    - name: (DEBUG) Check event label
+      run: echo $LABEL
+      env:
+        LABEL: ${{ github.event.label.name }}
 
   #   - name: Set new proposed version
   #     uses: paulhatch/semantic-version@v5.4.0
