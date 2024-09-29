@@ -35,7 +35,7 @@ jobs:
           grep -E '^release-plz-20' |\
           sort -r |\
           head -n 1)
-        echo Found RP branch $LASTEST_RELEASE_PLZ
+        echo Found RP branch $LATEST_RELEASE_PLZ
     
   #   - name: Set new proposed version
   #     uses: paulhatch/semantic-version@v5.4.0
