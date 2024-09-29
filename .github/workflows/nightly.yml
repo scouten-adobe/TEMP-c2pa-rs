@@ -96,10 +96,18 @@ jobs:
         if [[ "$OLD_BASE_COMMIT" == "$NEW_BASE_COMMIT" && "$GH_EVENT_NAME" == "pull_request" ]]; then
           echo "Nightly already points to same base; leave unchanged";
           echo "base-commit=skip" >> "$GITHUB_OUTPUT"
-        else
-          echo "Updating nightly base";
-          echo "base-commit=$NEW_BASE_COMMIT" >> "$GITHUB_OUTPUT"
+          exit 0
+        elif [[ "$GH_EVENT_NAME" == "push" ]]; then
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          if ![[ git --no-pager log $LATEST_TAG..head --pretty=format:"%s" | grep -v "^chore" ]];
+            echo "Found non-chore commits on main since last commit; leave unchanged"
+            echo "(Expecting release-plz to create a new release branch)"
+            echo "base-commit=skip" >> "$GITHUB_OUTPUT"
+          exit 0
         fi
+
+        echo "Updating nightly base";
+        echo "base-commit=$NEW_BASE_COMMIT" >> "$GITHUB_OUTPUT"
 
     - name: Install Rust toolchain
       if: ${{ steps.choose-base.outputs.base-commit != 'skip' }}
