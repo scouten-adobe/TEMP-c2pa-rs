@@ -43,7 +43,8 @@ jobs:
 
         echo
 
-        OLD_BASE_COMMIT=$(git checkout -b nightly --track origin/nightly && git log nightly --skip=1 -n 1 --format=%H)
+        git checkout -b nightly --track origin/nightly
+        OLD_BASE_COMMIT=$(git log nightly --skip=1 -n 1 --format=%H)
 
         echo "Nightly commit ID is $OLD_BASE_COMMIT"
 
