@@ -37,11 +37,11 @@ jobs:
           head -n 1)
 
         if [ -z "$LATEST_RELEASE_PLZ" ]; then \
-          BASE_BRANCH=main \
+          BASE_BRANCH=main; \
           echo "No release-plz branch; using main"; \
         else \
           echo Found RP branch $LATEST_RELEASE_PLZ; \
-          BASE_BRANCH=$LATEST_RELEASE_PLZ \
+          BASE_BRANCH=$LATEST_RELEASE_PLZ; \
         fi
 
         echo Found base branch $BASE_BRANCH
