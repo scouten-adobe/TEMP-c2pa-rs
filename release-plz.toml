@@ -17,7 +17,6 @@ _{{ timestamp | date(format="%d %B %Y") }}_
 {% endfor %}
 {% endif -%}
 {%- endfor -%}
-
 """
 
 commit_parsers = [
