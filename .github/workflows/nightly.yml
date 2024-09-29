@@ -24,19 +24,17 @@ jobs:
         fetch-depth: 0
         token: ${{ secrets.RELEASE_PLZ_TOKEN }}
 
-    - name: (DEBUG) Check branch list
+    - name: (DEBUG) Check remote branch list
       run: |
-        git branch --list
+        git --no-pager branch --remote | sed 's|origin/||'
 
     - name: (DEBUG) Sort branch list
       run: |
-        git --no-pager branch --format="%(refname:short)" | grep -E '^(release-plz|main)' | sort -r
+        git --no-pager branch --format="%(refname:short)" --remote |\
+          sed 's|origin/||' |\
+          grep -E '^(release-plz|main)' |\
+          sort -r
     
-    - name: (DEBUG) Check event label
-      run: echo $LABEL
-      env:
-        LABEL: ${{ github.event.label.name }}
-
   #   - name: Set new proposed version
   #     uses: paulhatch/semantic-version@v5.4.0
   #     id: set-version
