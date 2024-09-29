@@ -100,12 +100,12 @@ jobs:
 
         export NIGHTLY_SUFFIX=$(echo -nightly+`date +%F`-`git rev-parse --short HEAD`)
         echo Will add nightly suffix $NIGHTLY_SUFFIX
+        sed -i "s/^version = \"([^\"]*)\"$/version = \"&$NIGHTLY_SUFFIX\"/;" sdk/Cargo.toml
 
-    # - name: Adjust crate versions to include nightly flag
-    #   run: |
-    #     sed -i "s/^version = \"([^\"]*)\"$/version = \"$VERSION\"/;" sdk/Cargo.toml
-    #   env:
-    #     VERSION: ${{ steps.set-nightly-version.outputs.version }}
+        echo
+        echo Proposed changes:
+
+        git diff
     
   #   - name: Install Rust toolchain
   #     uses: dtolnay/rust-toolchain@stable
