@@ -102,6 +102,7 @@ jobs:
         fi
 
     - name: Install Rust toolchain
+      if: ${{ steps.choose-base.outputs.base-commit != 'skip' }}
       uses: dtolnay/rust-toolchain@stable
       with:
         components: cargo
