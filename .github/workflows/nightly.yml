@@ -30,18 +30,18 @@ jobs:
 
     - name: (DEBUG) Choose base branch
       run: |
-        LATEST_RELEASE_PLZ=$(git --no-pager branch --format="%(refname:short)" --remote |\
-          sed 's|origin/||' |\
-          grep -E '^release-plz-20' |\
-          sort -r |\
+        LATEST_RELEASE_PLZ=$(git --no-pager branch --format="%(refname:short)" --remote |
+          sed 's|origin/||' |
+          grep -E '^release-plz-20' |
+          sort -r |
           head -n 1)
 
-        if [ -z "$LATEST_RELEASE_PLZ" ]; then \
-          BASE_BRANCH=main; \
-          echo "No release-plz branch; using main"; \
-        else \
-          echo Found RP branch $LATEST_RELEASE_PLZ; \
-          BASE_BRANCH=$LATEST_RELEASE_PLZ; \
+        if [ -z "$LATEST_RELEASE_PLZ" ]; then
+          BASE_BRANCH=main;
+          echo "No release-plz branch; using main";
+        else
+          echo Found RP branch $LATEST_RELEASE_PLZ;
+          BASE_BRANCH=$LATEST_RELEASE_PLZ;
         fi
 
         echo Found base branch $BASE_BRANCH
