@@ -14,7 +14,6 @@ on:
 jobs:
   # Create snapshot of main branch for nightly build
   nightly-snapshot:
-    # if: ${{ !github.event.label || github.event.label.name == 'release' }}
     name: Create snapshot
     runs-on: ubuntu-latest
 
