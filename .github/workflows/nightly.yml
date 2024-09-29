@@ -9,7 +9,8 @@ on:
       - reopened
       - edited
   schedule:
-    - cron: "0 5 * * *" # 0500 UTC every day
+    - cron: "0 10 * * *" # 1000 UTC every day
+      # NOTE: DO NOT MERGE THIS BACK TO MAIN
 
 jobs:
   # Create snapshot of main branch for nightly build
