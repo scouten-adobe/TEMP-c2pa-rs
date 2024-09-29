@@ -1,4 +1,4 @@
-name: Nightly build
+name: Nightly
 
 on:  
   workflow_dispatch:
@@ -9,13 +9,13 @@ on:
       - reopened
       - edited
   schedule:
-    - cron: "0 10 * * *" # 1000 UTC every day
+    - cron: "0 * * * *" # hourly (should be 0500 UTC)
       # NOTE: DO NOT MERGE THIS BACK TO MAIN
 
 jobs:
   # Create snapshot of latest main or release branch for nightly build
   nightly-snapshot:
-    name: Create snapshot
+    name: Update nightly branch
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +27,12 @@ jobs:
 
     - name: Choose base commit for nightly snapshot
       id: choose-base
+      env:
+        GH_EVENT_NAME: ${{ github.event_name }}
       run: |
+        echo "Event triggered by $GH_EVENT_NAME"
+        echo
+
         echo "Listing branches on remote"
         echo
 
@@ -84,7 +89,7 @@ jobs:
         echo "Choosing base branch $BASE_BRANCH because it's newer"
         echo "$BASE_BRANCH commit ID is $NEW_BASE_COMMIT"
 
-        if [[ "$OLD_BASE_COMMIT" == "$NEW_BASE_COMMIT" ]]; then
+        if [[ "$OLD_BASE_COMMIT" == "$NEW_BASE_COMMIT" && "$GH_EVENT_NAME" == "pull_request"]]; then
           echo "Nightly already points to same base; leave unchanged";
           echo "base-commit=skip" >> "$GITHUB_OUTPUT"
         else
