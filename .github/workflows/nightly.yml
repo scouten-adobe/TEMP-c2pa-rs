@@ -144,7 +144,7 @@ jobs:
         git diff
     
     - name: Commit Cargo.toml and Cargo.lock
-      uses: stefanzweifel/git-auto-commit-action@v5
+      uses: stefanzweifel/git-auto-commit-action@v7
       id: commit
       if: ${{ steps.choose-base.outputs.base-commit != 'skip' }}
       with:
