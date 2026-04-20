@@ -101,6 +101,7 @@ pub fn sign(
     }
 }
 
+/// what does this even do anyway
 #[async_generic(async_signature(
     signer: &dyn AsyncRawSigner,
     data: &[u8],
