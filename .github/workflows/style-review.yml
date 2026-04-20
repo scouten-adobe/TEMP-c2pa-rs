@@ -19,6 +19,6 @@ jobs:
       pr_number: ${{ github.event.pull_request.number }}
       repository: ${{ github.repository }}
     secrets:
-      ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      BEDROCK_ENDPOINT_URL: ${{ secrets.BEDROCK_ENDPOINT_URL }}
+      BEDROCK_BEARER_TOKEN: ${{ secrets.BEDROCK_BEARER_TOKEN }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
