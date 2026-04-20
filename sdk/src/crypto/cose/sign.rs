@@ -101,6 +101,14 @@ pub fn sign(
     }
 }
 
+/// Given an arbitrary block of data and a [`RawSigner`], generate
+/// a signature over that payload.
+///
+/// If `box_size` is present, will pad the signature block to that
+/// number of bytes or error if the signature is too large.
+///
+/// Use `tss` to specify whether C2PA version 1 (deprecated) or
+/// version 2 (recommended) is to be used for time-stamp storage.
 #[async_generic(async_signature(
     signer: &dyn AsyncRawSigner,
     data: &[u8],
