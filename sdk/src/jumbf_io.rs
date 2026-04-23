@@ -36,7 +36,7 @@ use crate::{
     maybe_send_sync::MaybeSend,
 };
 
-// initialize asset handlers
+// Initialize asset handlers.
 lazy_static! {
     static ref CAI_READERS: HashMap<String, Box<dyn AssetIO>> = {
         let handlers: Vec<Box<dyn AssetIO>> = vec![
@@ -57,9 +57,9 @@ lazy_static! {
 
         let mut handler_map = HashMap::new();
 
-        // build handler map
+        // Build handler map.
         for h in handlers {
-            // get the supported types add entry for each
+            // Get the supported types and add an entry for each.
             for supported_type in h.supported_types() {
                 handler_map.insert(supported_type.to_string(), h.get_handler(supported_type));
             }
@@ -69,7 +69,7 @@ lazy_static! {
     };
 }
 
-// initialize streaming write handlers
+// Initialize streaming write handlers.
 lazy_static! {
     static ref CAI_WRITERS: HashMap<String, Box<dyn CAIWriter>> = {
         let handlers: Vec<Box<dyn AssetIO>> = vec![
@@ -87,11 +87,12 @@ lazy_static! {
         ];
         let mut handler_map = HashMap::new();
 
-        // build handler map
+        // Build handler map.
         for h in handlers {
-            // get the supported types add entry for each
+            // Get the supported types and add an entry for each.
             for supported_type in h.supported_types() {
-                if let Some(writer) = h.get_writer(supported_type) { // get streaming writer if supported
+                // Get streaming writer if supported.
+                if let Some(writer) = h.get_writer(supported_type) {
                     handler_map.insert(supported_type.to_string(), writer);
                 }
             }
@@ -106,7 +107,7 @@ pub(crate) fn is_bmff_format(asset_type: &str) -> bool {
     bmff_io.supported_types().contains(&asset_type)
 }
 
-/// Return jumbf block from in memory asset
+/// Returns the JUMBF block from an in-memory asset.
 #[allow(dead_code)]
 pub fn load_jumbf_from_memory(asset_type: &str, data: &[u8]) -> Result<Vec<u8>> {
     let mut buf_reader = Cursor::new(data);
@@ -114,7 +115,7 @@ pub fn load_jumbf_from_memory(asset_type: &str, data: &[u8]) -> Result<Vec<u8>> 
     load_jumbf_from_stream(asset_type, &mut buf_reader)
 }
 
-/// Return jumbf block from stream asset
+/// Returns the JUMBF block from a stream asset.
 pub fn load_jumbf_from_stream(asset_type: &str, input_stream: &mut dyn CAIRead) -> Result<Vec<u8>> {
     let cai_block = match get_cailoader_handler(asset_type) {
         Some(asset_handler) => asset_handler.read_cai(input_stream)?,
@@ -125,8 +126,10 @@ pub fn load_jumbf_from_stream(asset_type: &str, input_stream: &mut dyn CAIRead) 
     }
     Ok(cai_block)
 }
-/// writes the jumbf data in store_bytes
-/// reads an asset of asset_type from reader, adds jumbf data and then writes to writer
+/// Writes the JUMBF data in `store_bytes`.
+///
+/// Reads an asset of `asset_type` from `reader`, adds JUMBF data,
+/// and then writes to `writer`.
 pub fn save_jumbf_to_stream(
     asset_type: &str,
     input_stream: &mut dyn CAIRead,
@@ -139,7 +142,8 @@ pub fn save_jumbf_to_stream(
     }
 }
 
-/// writes the jumbf data in store_bytes into an asset in data and returns the newly created asset
+/// Writes the JUMBF data in `store_bytes` into an asset in `data` and
+/// returns the newly created asset.
 pub fn save_jumbf_to_memory(asset_type: &str, data: &[u8], store_bytes: &[u8]) -> Result<Vec<u8>> {
     let mut input_stream = Cursor::new(data);
 
@@ -211,15 +215,16 @@ pub(crate) fn supported_builder_mime_types() -> Vec<String> {
 }
 
 #[cfg(feature = "file_io")]
-/// Save JUMBF data to a file.
+/// Saves JUMBF data to a file.
 ///
-/// Parameters:
-/// * save_jumbf to a file
-/// * in_path - path is source file
-/// * out_path - path to the output file
+/// # Parameters
 ///
-/// If no output file is given an new file will be created with "-c2pa" appending to file name e.g. "test.jpg" => "test-c2pa.jpg"
-/// If input == output then the input file will be overwritten.
+/// * `in_path` - path to the source file
+/// * `out_path` - path to the output file
+///
+/// If no output file is given, a new file will be created with `-c2pa`
+/// appended to the file name (e.g., `test.jpg` => `test-c2pa.jpg`).
+/// If input equals output then the input file will be overwritten.
 pub fn save_jumbf_to_file<P1: AsRef<Path>, P2: AsRef<Path>>(
     data: &[u8],
     in_path: P1,
@@ -227,7 +232,7 @@ pub fn save_jumbf_to_file<P1: AsRef<Path>, P2: AsRef<Path>>(
 ) -> Result<()> {
     let ext = get_file_extension(in_path.as_ref()).ok_or(Error::UnsupportedType)?;
 
-    // if no output path make a new file based off of source file name
+    // If no output path, make a new file based off of the source file name.
     let asset_out_path: PathBuf = match out_path.as_ref() {
         Some(p) => p.as_ref().to_owned(),
         None => {
@@ -239,37 +244,44 @@ pub fn save_jumbf_to_file<P1: AsRef<Path>, P2: AsRef<Path>>(
         }
     };
 
-    // clone output to be overwritten
+    // Clone output to be overwritten.
     if in_path.as_ref() != asset_out_path {
         fs::copy(in_path, &asset_out_path).map_err(Error::IoError)?;
     }
 
     match get_assetio_handler(&ext) {
         Some(asset_handler) => {
-            // patch if possible to save time and resources
+            // Patch if possible to save time and resources.
             if let Some(patch_handler) = asset_handler.asset_patch_ref() {
                 if patch_handler.patch_cai_store(&asset_out_path, data).is_ok() {
                     return Ok(());
                 }
             }
 
-            // couldn't patch so just save
+            // Couldn't patch so just save.
             asset_handler.save_cai_store(&asset_out_path, data)
         }
         _ => Err(Error::UnsupportedType),
     }
 }
 
-/// Updates jumbf content in a file, this will directly patch the contents no other processing is done.
-/// The search for content to replace only occurs over the jumbf content.
-/// Note: it is recommended that the replace contents be <= length of the search content so that the length of the
-/// file does not change. If it does that could make the new file unreadable. This function is primarily useful for
-/// generating test data since depending on how the file is rewritten the hashing mechanism should detect any tampering of the data.
+/// Updates JUMBF content in a file by directly patching the contents;
+/// no other processing is done.
 ///
-/// out_path - path to file to be updated
-/// search_bytes - bytes to be replaced
-/// replace_bytes - replacement bytes
-/// returns the location where splice occurred
+/// The search for content to replace only occurs over the JUMBF content.
+///
+/// NOTE: It is recommended that the replace contents be <= length of the
+/// search content so that the length of the file does not change. If it
+/// does, that could make the new file unreadable. This function is
+/// primarily useful for generating test data since, depending on how the
+/// file is rewritten, the hashing mechanism should detect any tampering
+/// of the data.
+///
+/// * `out_path` - path to file to be updated
+/// * `search_bytes` - bytes to be replaced
+/// * `replace_bytes` - replacement bytes
+///
+/// Returns the location where the splice occurred.
 #[allow(dead_code)] // this only used in Store unit tests, update this when those tests are updated
 #[cfg(feature = "file_io")]
 pub(crate) fn update_file_jumbf(
@@ -289,7 +301,7 @@ pub(crate) fn update_file_jumbf(
 }
 
 #[cfg(feature = "file_io")]
-/// load the JUMBF block from an asset if available
+/// Loads the JUMBF block from an asset if available.
 pub fn load_jumbf_from_file<P: AsRef<Path>>(in_path: P) -> Result<Vec<u8>> {
     let ext = get_file_extension(in_path.as_ref()).ok_or(Error::UnsupportedType)?;
 
@@ -335,12 +347,14 @@ where
     }
 }
 
-/// removes the C2PA JUMBF from an asset
-/// Note: Use with caution since this deletes C2PA data
-/// It is useful when creating remote manifests from embedded manifests
+/// Removes the C2PA JUMBF from an asset.
 ///
-/// path - path to file to be updated
-/// returns Unsupported type or errors from remove_cai_store
+/// NOTE: Use with caution since this deletes C2PA data.
+/// It is useful when creating remote manifests from embedded manifests.
+///
+/// * `path` - path to file to be updated
+///
+/// Returns [`Error::UnsupportedType`] or errors from `remove_cai_store`.
 #[cfg(feature = "file_io")]
 pub fn remove_jumbf_from_file<P: AsRef<Path>>(path: P) -> Result<()> {
     let ext = get_file_extension(path.as_ref()).ok_or(Error::UnsupportedType)?;
@@ -350,7 +364,7 @@ pub fn remove_jumbf_from_file<P: AsRef<Path>>(path: P) -> Result<()> {
     }
 }
 
-/// returns a list of supported file extensions and mime types
+/// Returns a list of supported file extensions and MIME types.
 pub fn get_supported_types() -> Vec<String> {
     CAI_READERS.keys().map(|k| k.to_owned()).collect()
 }
@@ -384,9 +398,9 @@ pub mod tests {
             Box::new(FlacIO::new("")),
         ];
 
-        // build handler map
+        // Build handler map.
         for h in handlers {
-            // get the supported types add entry for each
+            // Get the supported types and add an entry for each.
             for supported_type in h.supported_types() {
                 assert!(get_assetio_handler(supported_type).is_some());
             }
@@ -410,9 +424,9 @@ pub mod tests {
             Box::new(FlacIO::new("")),
         ];
 
-        // build handler map
+        // Build handler map.
         for h in handlers {
-            // get the supported types add entry for each
+            // Get the supported types and add an entry for each.
             for supported_type in h.supported_types() {
                 assert!(get_cailoader_handler(supported_type).is_some());
             }
@@ -432,9 +446,9 @@ pub mod tests {
             Box::new(GifIO::new("")),
         ];
 
-        // build handler map
+        // Build handler map.
         for h in handlers {
-            // get the supported types add entry for each
+            // Get the supported types and add an entry for each.
             for supported_type in h.supported_types() {
                 assert!(get_caiwriter_handler(supported_type).is_some());
             }
@@ -497,7 +511,7 @@ pub mod tests {
         let jumbf2 = load_jumbf_from_stream(asset_type, &mut writer).unwrap();
         assert_eq!(jumbf, jumbf2);
 
-        // test removing cai store
+        // Test removing CAI store.
         writer.set_position(0);
         let handler = get_caiwriter_handler(asset_type).unwrap();
         let mut removed = Cursor::new(Vec::new());
@@ -511,7 +525,7 @@ pub mod tests {
         {
             assert!(matches!(&result.err().unwrap(), Error::JumbfNotFound));
         }
-        //assert!(matches!(result.err().unwrap(), Error::JumbfNotFound));
+        // assert!(matches!(result.err().unwrap(), Error::JumbfNotFound));
     }
 
     fn test_remote_ref(asset_type: &str, reader: &mut dyn CAIRead) {
@@ -589,9 +603,9 @@ pub mod tests {
     fn test_streams_mp3() {
         let mut reader = std::fs::File::open("tests/fixtures/sample1.mp3").unwrap();
         test_jumbf("mp3", &mut reader);
-        // mp3 doesn't support remote refs
-        //reader.rewind().unwrap();
-        //test_remote_ref("mp3", &mut reader); // not working
+        // Mp3 doesn't support remote refs.
+        // reader.rewind().unwrap();
+        // test_remote_ref("mp3", &mut reader); // not working
     }
 
     #[test]
@@ -626,7 +640,7 @@ pub mod tests {
 
     #[test]
     fn test_streams_jxl() {
-        // Build a minimal JPEG XL container in memory for testing
+        // Build a minimal JPEG XL container in memory for testing.
         use crate::asset_handlers::jpegxl_io;
         let container = jpegxl_io::tests::build_test_jxl_container();
         let mut reader = Cursor::new(container);
